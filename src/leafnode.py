@@ -11,10 +11,7 @@ class LeafNode(HTMLNode):
             raise ValueError("LeafNode value cannot be None")
         if not self.tag:
             return self.value
-        return f"<{self.tag} {self.props_to_html()}>{self.value}</{self.tag}>"
-    
-    def props_to_html(self):
-        return " ".join([f'{key}="{value}"' for key, value in self.props.items()])
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
     
     def __eq__(self, other):
         return self.tag == other.tag and self.value == other.value and self.props == other.props
