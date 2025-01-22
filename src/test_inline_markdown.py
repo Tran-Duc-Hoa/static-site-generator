@@ -5,6 +5,7 @@ from inline_markdown import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes
 )
 
 from textnode import TextNode, TextType
@@ -206,6 +207,82 @@ class TestInlineMarkdown(unittest.TestCase):
             new_nodes,
         )
 
+    def test_text_to_textnodes_bold(self):
+        text = "This is **bold** text"
+        result = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" text", TextType.TEXT),
+            ],
+            result,
+        )
+
+    def test_text_to_textnodes_italic(self):
+        text = "This is *italic* text"
+        result = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" text", TextType.TEXT),
+            ],
+            result,
+        )
+
+    def test_text_to_textnodes_code(self):
+        text = "This is `code` text"
+        result = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" text", TextType.TEXT),
+            ],
+            result,
+        )
+
+    def test_text_to_textnodes_image(self):
+        text = "This is an image ![alt text](https://www.example.com/image.png)"
+        result = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is an image ", TextType.TEXT),
+                TextNode("alt text", TextType.IMAGE, "https://www.example.com/image.png"),
+            ],
+            result,
+        )
+
+    def test_text_to_textnodes_link(self):
+        text = "This is a link [Google](https://www.google.com)"
+        result = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is a link ", TextType.TEXT),
+                TextNode("Google", TextType.LINK, "https://www.google.com"),
+            ],
+            result,
+        )
+
+    def test_text_to_textnodes_combined(self):
+        text = "This is **bold**, *italic*, `code`, an image ![alt text](https://www.example.com/image.png), and a link [Google](https://www.google.com)"
+        result = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(", ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(", ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(", an image ", TextType.TEXT),
+                TextNode("alt text", TextType.IMAGE, "https://www.example.com/image.png"),
+                TextNode(", and a link ", TextType.TEXT),
+                TextNode("Google", TextType.LINK, "https://www.google.com"),
+            ],
+            result,
+        )
 
 if __name__ == "__main__":
     unittest.main()
